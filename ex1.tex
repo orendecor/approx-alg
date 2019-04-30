@@ -1,0 +1,52 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{enumerate}% http://ctan.org/pkg/enumerate
+
+\title{Ex. 1}
+\author{Yuval Gitlitz \& Oren Roth}
+\date{28.4}
+
+\begin{document}
+
+\maketitle
+
+\begin{enumerate}
+	\item
+a)
+\\ 
+b) The algorithm:
+\begin{itemize}
+	\item Find min cost cycle cover - denoted by $C = (c_1,\ldots,c_k)$. For every $i \in [k]$, define $e_i = (u_i,v_i)$ as an edge in $c_i$.
+	\item $G\leftarrow \{(u_k,v_1)\}$
+	\item for $i=1$ to $k-1$ do:
+	\begin{itemize}
+		\item $G \leftarrow G \cup (c_i \setminus \{e_i\} \cup \{u_i,v_{i+1}\})$
+	\end{itemize}
+	\item $G \leftarrow G \cup (c_i \setminus \{e_i\} \cup \{u_i,v_{i+1}\})$
+\end{itemize}
+\begin{proof}
+We will show :
+\begin{enumerate}[I]
+	\item $G$ is Hamiltonian cycle. 
+	\item cost $G$ is at most $\frac{4}{3}OPT$. 
+\end{enumerate}
+\begin{enumerate}[I]
+	\item We will show the edges in $G$ admit Hamiltonian cycle. We start by $v_1$ and go throug edges of cycle $c_1$ until the node $u_1$ than take the edge $u_1,v_2$ and continue in this fashion until reaching node $u_k$, then taking the edge $\{(u_k,v_1)\}$ and we done,
+	\item $cost(C) \le OPT$ because the optimal solution is feasible solution for the cycle cover problem. 
+	As each cycle is at least of size of 3 we have that $k\le \frac{|V|}{3}$. $G$ replace $k$ edges of size at least 1 with $k$ edges of size at most $2$, then:
+	\begin{align*}
+	G \le cost(C) + k \le cost(C) + \frac{|V|}{3} \le OPT +\frac{|V|}{3} \le \frac{4}{3}OPT
+	\end{align*}
+	And the last inequality is due to the fact that the optimal solution visits $|V|$ edges of weight one at least. 
+	
+\end{enumerate}	
+\end{proof}
+
+\item
+\item 
+\item 
+\end{enumerate}
+
+\end{document}
