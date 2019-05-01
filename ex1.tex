@@ -14,7 +14,9 @@
 
 \begin{enumerate}
 	\item
-a)
+a) Let $G=(V,E),w$ be our graph and the weight function on the edges accordingly. We will create bipartite graph $G'=(V\times \{0\},V\times \{1\},E')$ where,
+$$E' = \{((u,0),(v,1)): (u,v)\in E \}$$
+With weight function $w':E'\rightarrow R$, s.t. $w'(((u,0),(v,1))) = w((u,v))$. We will run weighted prefect matching and receive $M$. We will build the cycle cover accordingly to $M$, cycle by cycle. $c_0$ will be constructed by taking and delete an edge $((u,0),(v,1))$ in $M$ and add $(u,v)$ to $c_0$, go on by take $((v,0),(w,1))$ in $M$, remove it from $M$ and add $(v,w)$ to the cycle until we will reach a node which is matched to $(u,1)$. By then we will finish one cycle and if there are more edges in $M$ we will construct a new cycle $c_1$ and so on until there are no more edges to delete in $M$.
 \\ 
 b) The algorithm:
 \begin{itemize}
@@ -44,7 +46,16 @@ We will show :
 \end{enumerate}	
 \end{proof}
 
-\item
+\item \begin{enumerate}
+	\item We build MST $T = (R,E')$ on the sub graph which includes only nodes in $R$. Our algorithm will return $T$ which is also a feasible solution. We will show $c(T)$ is at most $2OPT$. Let $\tilde T=(\tilde V,\tilde E)$ be the steiner tree which has $c(\tilde T)=OPT$. $c(\tilde T) = \sum_{v\in \tilde V} c(v) + \sum_{e\in \tilde E} c(e)$. In the same way as we showed in class we can have that:
+	\begin{align*}
+		2 \cdot \sum_{e\in \tilde E} c(e) \ge \sum_{e\in E'} c(e)
+	\end{align*}
+	 and since $\sum_{v\in R} = 0$ we conclude:
+	 $$c(T) = \sum_{v\in R} c(v) + \sum_{e\in E'} c(e) = \sum_{e\in \tilde E} c(e) \le 2OPT$$
+	\item
+	\item We will run the 
+\end{enumerate}
 \item 
 \item 
 \end{enumerate}
