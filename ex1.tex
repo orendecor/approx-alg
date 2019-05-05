@@ -4,6 +4,20 @@
 \usepackage{amsmath}
 \usepackage{enumerate}% http://ctan.org/pkg/enumerate
 
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[section]{Lemma}
+\newtheorem{claim}[section]{Claim}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+
 \title{Ex. 1}
 \author{Yuval Gitlitz \& Oren Roth}
 \date{28.4}
@@ -14,7 +28,7 @@
 
 \begin{enumerate}
 	\item
-a) Let $G=(V,E),w$ be our graph and the weight function on the edges accordingly. We will create bipartite graph $G'=(V\times \{0\},V\times \{1\},E')$ where,
+a) Let $G=(V,E),w$ be our graph and the weight function on the edges respectively. We will create bipartite graph $G'=(V\times \{0\},V\times \{1\},E')$ where,
 $$E' = \{((u,0),(v,1)): (u,v)\in E \}$$
 With weight function $w':E'\rightarrow R$, s.t. $w'(((u,0),(v,1))) = w((u,v))$. We will run weighted prefect matching and receive $M$. We will build the cycle cover accordingly to $M$, cycle by cycle. $c_0$ will be constructed by taking and delete an edge $((u,0),(v,1))$ in $M$ and add $(u,v)$ to $c_0$, go on by take $((v,0),(w,1))$ in $M$, remove it from $M$ and add $(v,w)$ to the cycle until we will reach a node which is matched to $(u,1)$. By then we will finish one cycle and if there are more edges in $M$ we will construct a new cycle $c_1$ and so on until there are no more edges to delete in $M$.
 \\ 
@@ -53,11 +67,90 @@ We will show :
 	\end{align*}
 	 and since $\sum_{v\in R} = 0$ we conclude:
 	 $$c(T) = \sum_{v\in R} c(v) + \sum_{e\in E'} c(e) = \sum_{e\in \tilde E} c(e) \le 2OPT$$
+	\item Assume towards contradiction that there is exists a $(c\cdot ln |R|)$-approximation algorithm, we will show how to build a reduction based $O(log n)$-approximation algorithm for set cover and we will arrive to contradiction. 
+	
+\textbf{	The reduction algorithm:}
+\begin{enumerate}
 	\item
-	\item We will run the 
+	Given $X =(U,S=\{S_1,\ldots S_m\})$ input for set cover, build the following steiner tree input, $X'=(G=(V,E),R,w)$ where:
+	\begin{align*}
+	V &= U \cup S\\
+	E &= (S\times S) \cup \{(S_i,e_j): e_j\in S_i, S_i\in S\}\\
+	R &= U\\
+	\forall& e\in E:\quad w(e)=0\\
+	\forall& S_i\in S:\quad w(S_i)=w_i\\
+	\forall& e_i\in U:\quad w(e_i)=0\\
+	\end{align*}
+	\item Run the $(c\cdot ln |R|)$-approximation algorithm on $G,R,w$ and receive $T$. 
+	\item Return $I = \{S_i : S_i\in V(T); S_i \in S\}$.
+\end{enumerate}
+We will state two useful lemmas:
+		
+		\begin{lemma}\label{lemma1}
+		Given $\tilde T$ solution to $X'$, $\tilde I = \{S_i : S_i\in V(\tilde T); S_i \in S\}$ is a feasible solution for $X$.
+		\end{lemma}
+		\begin{proof}
+We set $R=U$, and because each node in $R$ is only connected to their sets, hence because is $T$ connected the only way to saturate all the terminal is by taking sets which include all of them - and we conclude $I$ is a valid solution to the set cover problem.
+		\end{proof}
+\begin{lemma}\label{lemma2}
+Given $\tilde T$ solution to $X'$, $\tilde I = \{S_i : S_i\in V(\tilde T); S_i \in S\}$ has the same weight of $\tilde T$ in $X$.
+\end{lemma}
+\begin{proof}
+	The weight of nodes in $S$ is the same as the weight of  the set cover weights, all the other nodes and edges are of weight zero. Therefore:
+	$$w(\tilde T) = w(\{S_i : S_i\in V(\tilde T); S_i \in S\}) = w(\tilde I) $$
+\end{proof}
+	\begin{claim}
+		The algorithm is $O(log n)$-approximation algorithm for set cover.
+	\end{claim}
+	\begin{proof}
+		By Lemma \ref{lemma1} $I$ is feasible solution and by Lemma \ref{lemma2} we know $w(I)= w(T)$. Denote by $O_{steiner},O_{set-cover}$ the optimal solutions values of $X',X$ respectively. We conclude:
+		\begin{align*}
+		w(I) = w(T) \stackrel{(i)}{\leq} (c\cdot ln |R|)\cdot O_{steiner} = (c\cdot ln |R|)\cdot O_{set-cover} 
+		\end{align*}
+(i) is due to our assumption and the last equality is due to Lemma \ref{lemma2}.
+	\end{proof}
+As $|R|=n$ we found an $O(log n)$-approximation algorithm for set-cover which accordingly to what we learn in class could happen only if $P=NP$.
+	\item
 \end{enumerate}
 \item 
-\item 
+\item \begin{enumerate}
+	\item Let $G=(V,E)$ be a graph we will show the claim holds by induction on $|V|$. Base: $|V| =0$ trivial. Assume that when $|V| < n$ the claim holds. Let be $G$ be a graph with maximum degree $\Delta$, with $|V|=n$ and let $v\in V$. Let $G' = G - v$. $|V(G')| = n - 1$ and its maximum degree at most $\Delta$. We use the induction hypothesis in order to color $G'$ with $\Delta + 1$ colors.
+Use the same coloring used for $G'$ in $G$ for all the vertices except $v$. For $v$, it has at most $\Delta$ neighbors and it can be colored using a different color than its neighbors. We used at most $\Delta + 1$ to color the vertices in $G$ hence the claim holds.
+
+The algorithm for finding $(\Delta+1)$-coloring will work in a greedy fashion each time choose an uncolored node and color it with an available color. As the maximum degree is $\Delta$ we know we can do it with $\Delta +1$ colors.
+
+Next we will show that a bipartite graph is two colorable. Let $G = (A, B, E)$ be a bipartite graph. We color all the vertices in $A$ using the first color and all the vertices in $B$ using the second color. All the edges in $A$ are disjoint hence we don't have two vertices which use the first color which are connected. The same applies for $B$ and the second color.
+	\item
+	\begin{enumerate}
+		\item While there exist $v \in V(G)$ such that $\deg(v) \geq \sqrt{n}$
+		\begin{enumerate}
+			\item Color its neighbors using two colors
+			\item $G \leftarrow G - N(v)$
+		\end{enumerate}
+		\item color $G$ using $\sqrt{(n)} + 1$ colors
+	\end{enumerate}
+	
+
+	\begin{claim}
+		The algorithm run in polynomial time
+\end{claim}
+\begin{proof}
+	First, let us show that step $A$ can be done in polynomial time. The neighborhood of any vertex $v$ in the graph can be two colored because each subgraph is three colored, and if we used one color for $v$, the neighborhood can be two colored. Two colored subgraph is also a two bipartite graph, hence we can use the previous question to color it using 2 colors.
+	
+	The loop in step $i$ runs at most $\sqrt{n}$ times because each iteration, we remove at least $\sqrt{n}$ vertices from $G$. Additionally, each iteration run polynomial time. Hence, the total run time of step $i$ is polynomial.
+	
+	Step $ii$ runs in polynomial time using the algorithm from the previous section.
+\end{proof}
+
+\begin{claim}
+	The algorithm is using $O(\sqrt n)$ colors
+\end{claim}
+\begin{proof}
+	In each iteration of loop $i$, we use two colors. There are at most $\sqrt{n}$ iteration, hence for step $i$ we use $2 \sqrt n = O(\sqrt n)$ colors.
+	For step $i$ we used $\sqrt n + 1$ colors.
+	For that reason, the total number of colors used by the algorithm is $O(\sqrt n)$.
+\end{proof}
+\end{enumerate}
 \end{enumerate}
 
 \end{document}
