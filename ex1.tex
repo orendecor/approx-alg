@@ -120,7 +120,7 @@ Use the same coloring used for $G'$ in $G$ for all the vertices except $v$. For 
 The algorithm for finding $(\Delta+1)$-coloring will work in a greedy fashion each time choose an uncolored node and color it with an available color. As the maximum degree is $\Delta$ we know we can do it with $\Delta +1$ colors.
 
 Next we will show that a bipartite graph is two colorable. Let $G = (A, B, E)$ be a bipartite graph. We color all the vertices in $A$ using the first color and all the vertices in $B$ using the second color. All the edges in $A$ are disjoint hence we don't have two vertices which use the first color which are connected. The same applies for $B$ and the second color.
-	\item
+	\item \textbf{Algorithm for finding $O(\sqrt{(n)})-coloring$:}
 	\begin{enumerate}
 		\item While there exist $v \in V(G)$ such that $\deg(v) \geq \sqrt{n}$
 		\begin{enumerate}
@@ -150,7 +150,39 @@ Next we will show that a bipartite graph is two colorable. Let $G = (A, B, E)$ b
 	For step $i$ we used $\sqrt n + 1$ colors.
 	For that reason, the total number of colors used by the algorithm is $O(\sqrt n)$.
 \end{proof}
+\item 
+\textbf{Algorithm for finding $O(n^\frac{2}{3})-coloring$:}
+	\begin{enumerate}
+		\item While there exist $v \in V(G)$ such that $\deg(v) \geq n^\frac{2}{3}$
+		\begin{enumerate}
+			\item Color $n^\frac{2}{3}$ of his neighbors using $O(n^\frac{1}{3})$ colors.
+			\item $G \leftarrow G - N(v)$
+		\end{enumerate}
+		\item color $G$ using $n^\frac{2}{3} + 1$ colors
+	\end{enumerate}
+	
+	
+	\begin{claim}
+		The algorithm run in polynomial time
+	\end{claim}
+	\begin{proof}
+		First, let us show that step $A$ can be done in polynomial time. The neighborhood of any vertex $v$ in the graph can be three colored because each subgraph is 4-colored, and if we used one color for $v$, the neighborhood can be three colored. Three colored subgraph of size $n^\frac{2}{3}$ can be colored with using the previous algorithm with $n^\frac{1}{3}$.
+		
+		The loop in step $i$ runs at most $n^\frac{1}{3}$ times because each iteration, we remove at least $n^\frac{2}{3}$ vertices from $G$. Additionally, each iteration run polynomial time. Hence, the total run time of step $i$ is polynomial.
+		
+		Step $ii$ runs in polynomial time using the algorithm from section (a).
+	\end{proof}
+	
+	\begin{claim}
+		The algorithm is using $O(n^\frac{2}{3})$ colors
+	\end{claim}
+	\begin{proof}
+		In each iteration of loop $i$, we use $n^\frac{1}{3}$ colors. There are at most $n^\frac{1}{3}$ iteration, hence for step $i$ we use $n^\frac{2}{3}$ colors.
+		For step $i$ we used $n^\frac{2}{3} + 1$ colors.
+		For that reason, the total number of colors used by the algorithm is $O(n^\frac{2}{3})$.
+	\end{proof}
 \end{enumerate}
+
 \end{enumerate}
 
 \end{document}
