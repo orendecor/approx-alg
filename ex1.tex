@@ -3,7 +3,8 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{enumerate}% http://ctan.org/pkg/enumerate
-
+\usepackage{amsfonts}
+\usepackage{xparse}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}[theorem]{Corollary}
@@ -112,7 +113,103 @@ Given $\tilde T$ solution to $X'$, $\tilde I = \{S_i : S_i\in V(\tilde T); S_i \
 As $|R|=n$ we found an $O(log n)$-approximation algorithm for set-cover which accordingly to what we learn in class could happen only if $P=NP$.
 	\item
 \end{enumerate}
-\item 
+\item Giving graph $G=(V,E)$ we denote by $c^G_{max} = max \{c(e) : e\in E\}$. Define $\delta = \frac{\epsilon\cdot c^G_{max}}{|E|}$. We define two new cost function:
+\begin{align*}
+c' &: E \rightarrow \mathbb N\\
+c'(e) &= \text{ceil $c(e)$ to multiple of $\delta$}\\
+c'' &: E \rightarrow \mathbb N\\
+c''(e) &= \lceil c(e) / \delta \rceil
+\end{align*} 
+ We will build a 2-dimensions table $X=V\times (\frac{|E|\cdot (|V|-1)}{\epsilon} +1)$ where $X[v,j]$ has the min length of a path from $s$ to $v$ with cost (by $c''$) is at most $j$. We have:
+\begin{align*}
+X[v,j] = \begin{cases}
+0  & \text{if } j=0,v=s \\
+\infty  & \text{if } j=0,v\ne s \\
+\infty  & \text{if } j<0 \\
+min_{(u,v)\in E} \{ l((u,v)) + X[u,j-c''((u,v))]\}  & \text{else }
+\end{cases} \quad 
+\end{align*}
+We note that because any min length path is simple (as the lengths are positive) any min length path uses at most $|V|-1$ edges and hence the cost (by $c$) of a any min length path is bounded by $c^G_{max}\cdot (|V|-1)$. So we have that the any min length path has a cost, by $c''$ of at most:
+\begin{align*}
+\lceil c^G_{max} / \delta \rceil \cdot (|V|-1)= \frac{|E|}{\epsilon} \cdot (|V|-1) +1
+\end{align*}
+
+\begin{corollary}\label{corollary}
+The min cost (under $c'$) of a path from $s$ to $t$ is in one of the cells $X[t,j]$ for $1\le j \le t$. Moreover, it is in the cell of the first $j$ which holds $X[t,j]<L$.
+\end{corollary}
+\begin{claim}\label{claim:le}
+Let $O$ be the optimal path with cost $OPT$ under $c$. We have:
+$$\sum_{e\in O} c'(e) \le OPT +\epsilon\cdot c^G_{max}$$
+\end{claim}
+\begin{proof}
+\begin{align*}
+\sum_{e\in O} c'(e) \le \sum_{e\in O} (c(e) + \delta) = OPT + \sum_{e\in O}  \delta \le \\ \le OPT + |E| \frac{\epsilon\cdot c^G_{max}}{|E|} =OPT +\epsilon\cdot c^G_{max}
+\end{align*}
+\end{proof}
+Let $c_1,\ldots c_m$ denote the costs of the edges sorted from smallest to largest. We define $m$ subgraphs of $G$: $G_1,\ldots,G_m$ where $G_i$ has only edges of cost at most $c_i$. Now we are ready to present out algorithm-\\
+\textbf{FPTAS Algorithm based on linear programming:}
+\begin{enumerate}[I]
+	\item for each $i $=1 to m:
+	\begin{enumerate}
+		\item build $G_i$
+		\item calculate $c^{G_i}_{max}$
+		\item $\delta_i \leftarrow \frac{\epsilon\cdot c^{G_i}_{max}}{|E|}$
+		\item define $c'(e) = \lceil c(e) / \delta_i \rceil$
+		\item fill $X^i[v,j]$ for $v\in V$, $1\le j \le \frac{|E|}{\epsilon} \cdot (|V|-1) +1$ accordingly to $c''$ and the recurrence relation
+		\item  $S_i \leftarrow min_{1\le j \le \frac{|E|}{\epsilon} \cdot (|V|-1) +1} \{ X^i[t,j]\}$
+	\end{enumerate}
+	\item $A \leftarrow min_{1\le i \le m} \{ S_i\}$
+	\item $i \leftarrow argmin_{1\le i \le m} \{ S_i\}$
+	\item return Construct\_Solution(A,i)
+\end{enumerate}
+\textbf{Construct\_Solution(A,i)}
+\begin{enumerate}[I]
+	\item $S\leftarrow ()$
+	\item $v\leftarrow t$
+	\item for $j' = $1 to $ \frac{|E|}{\epsilon} \cdot (|V|-1) +1$ do
+	\begin{enumerate}\item if($X^i[t,j] = A$): $j\leftarrow j'$
+\end{enumerate}
+	\item while $v\ne s$ do
+	\begin{enumerate}
+		\item for each $(u,v)\in E$ do
+		\begin{enumerate}
+			\item if $ X^i[v,j] = l((u,v)) + X^i[u,j-c''((u,v))]$
+			\begin{itemize}
+				\item $j\leftarrow j-c''((u,v))$
+				\item $v \leftarrow u$
+				\item $S\leftarrow (u,v)\circ S$
+			\end{itemize}
+		\end{enumerate}
+	\end{enumerate}
+	\item return $S$
+\end{enumerate}
+\begin{claim} The algorithm run in polynomial time.
+\end{claim}
+\begin{proof}
+	
+\end{proof}
+\begin{claim} The algorithm return feasible solution.
+\end{claim}
+
+\begin{proof}
+By Corollary~\ref{corollary} we know in each $S_i$ (in row vi in the algorithm) we keep a value of min cost path of length at most $L$ in the graph $G_i$ by cost function $c''$. It is easy to show in induction that the Construct\_Solution algorithm take a cost of solution $A$ and index of graph and return a path from $s$ to $t$ in $G_i$ of cost $A$. We note that any optimal solution under $c''$ is also optimal solution under $c'$, and hence we know we return a solution of a min cost path from $s$ to $t$ in some graph $G_{i*}$ of length at most $L$.
+Note that as our algorithm didn't change the length of the edges, we return a path from $s$ to $t$ which is also feasible solution in the original graph.
+\end{proof}
+\begin{claim} The algorithm gives $1+\epsilon$ approximation.
+\end{claim}
+
+\begin{proof}
+	 By Claim~\ref{claim:le} we know that for any $c'$ defined over any $G_i$ we have:
+	$$\sum_{e\in O} c'(e) \le OPT +\epsilon\cdot c^{G_i}_{max}$$ 
+	Let $c_{j*}$ be the maximum cost of an edge in $O$. $O$ uses at least one edge of cost $c_{j*} = c^{G_{j*}}_{max}$ so for the $c'$ defined over $G_{j*}$ we have:
+		$$\sum_{e\in O} c'(e)\le OPT +\epsilon\cdot c^{G_{j*}}_{max} \le (1 +\epsilon)OPT$$ 
+
+Let $S$ be the solution our algorithm return. We have:
+\begin{align*}
+\sum_{e\in S} c(e) \le \sum_{e\in S} c'(e) \le \sum_{e\in O} c'(e)\le (1 +\epsilon)OPT
+\end{align*}
+Where the first inequality is due to the fact we ceil the costs and the second inequality is due to the fact we return min-cost solution under $c'$. 
+\end{proof}
 \item \begin{enumerate}
 	\item Let $G=(V,E)$ be a graph we will show the claim holds by induction on $|V|$. Base: $|V| =0$ trivial. Assume that when $|V| < n$ the claim holds. Let be $G$ be a graph with maximum degree $\Delta$, with $|V|=n$ and let $v\in V$. Let $G' = G - v$. $|V(G')| = n - 1$ and its maximum degree at most $\Delta$. We use the induction hypothesis in order to color $G'$ with $\Delta + 1$ colors.
 Use the same coloring used for $G'$ in $G$ for all the vertices except $v$. For $v$, it has at most $\Delta$ neighbors and it can be colored using a different color than its neighbors. We used at most $\Delta + 1$ to color the vertices in $G$ hence the claim holds.
