@@ -21,7 +21,7 @@
 
 \title{Ex. 1}
 \author{Yuval Gitlitz \& Oren Roth}
-\date{28.4}
+\date{\today}
 
 \begin{document}
 
@@ -31,8 +31,17 @@
 	\item
 a) Let $G=(V,E),w$ be our graph and the weight function on the edges respectively. We will create bipartite graph $G'=(V\times \{0\},V\times \{1\},E')$ where,
 $$E' = \{((u,0),(v,1)): (u,v)\in E \}$$
-With weight function $w':E'\rightarrow R$, s.t. $w'(((u,0),(v,1))) = w((u,v))$. We will run weighted prefect matching and receive $M$. We will build the cycle cover accordingly to $M$, cycle by cycle. $c_0$ will be constructed by taking and delete an edge $((u,0),(v,1))$ in $M$ and add $(u,v)$ to $c_0$, go on by take $((v,0),(w,1))$ in $M$, remove it from $M$ and add $(v,w)$ to the cycle until we will reach a node which is matched to $(u,1)$. By then we will finish one cycle and if there are more edges in $M$ we will construct a new cycle $c_1$ and so on until there are no more edges to delete in $M$.
-\\ 
+With weight function $w':E'\rightarrow R$, s.t. $w'(((u,0),(v,1))) = w((u,v))$.
+We will run weighted prefect matching and receive $M$.
+The cycle cover is simply created by taking the edges $C = \{uv | ((u, n), (v, n)) \in E\}$.
+
+The algorithm is polynomial: we only constructed a graph which is of size $2n$, run the polynomial min cost perfect matching algorithm, and constructed the min cost cover in linear time.
+
+Next, we will prove the algorithm works. For every $v \in V$, the algorithm returns $C$ such that $v$ is incidence exactly twice, for saturating the vertices $(v, 0), (v, 1)$ in $G'$. For every connected part $p \in (V, C)$, $p$ is a cycle because all its vertices have degree equals to two. Hence the algorithm returns a cycle cover. Additionally, for every cycle cover, $M$, in $G$ we will show there is a perfect matching in $G'$ of the same weight. Think of $M$ as directed.
+Let $A = \{((u, 0), (v, 1)) | uv \in E(M)\}$. All the vertices are saturated in $A$ because for every $v \in V$, $d_{out}(v) = d_{in}(v) = 1$. Additionally, $|A| = |V| = |V'| / 2$ hence $A$ is a perfect matching. By the way the weight function was constructed, $w'(A) = w(M)$. Hence $C$ is bounded by the min cost cycle cover.
+
+We showed that $C$ is a cycle cover, and it is bounded by the min cost cycle, hence it is a min cost cycle cover.
+
 b) The algorithm:
 \begin{itemize}
 	\item Find min cost cycle cover - denoted by $C = (c_1,\ldots,c_k)$. For every $i \in [k]$, define $e_i = (u_i,v_i)$ as an edge in $c_i$.
@@ -52,14 +61,19 @@ We will show :
 \begin{enumerate}[I]
 	\item We will show the edges in $G$ admit Hamiltonian cycle. We start by $v_1$ and go throug edges of cycle $c_1$ until the node $u_1$ than take the edge $u_1,v_2$ and continue in this fashion until reaching node $u_k$, then taking the edge $\{(u_k,v_1)\}$ and we done,
 	\item $cost(C) \le OPT$ because the optimal solution is feasible solution for the cycle cover problem. 
-	As each cycle is at least of size of 3 we have that $k\le \frac{|V|}{3}$. $G$ replace $k$ edges of size at least 1 with $k$ edges of size at most $2$, then:
+	As each cycle is at least of size of 2 we have that $k\le \frac{|V|}{2}$. $G$ replace $k$ edges of size at least 1 with $k$ edges of size at most $2$, then:
 	\begin{align*}
-	G \le cost(C) + k \le cost(C) + \frac{|V|}{3} \le OPT +\frac{|V|}{3} \le \frac{4}{3}OPT
+	G \le cost(C) + k \le cost(C) + \frac{|V|}{2} \le OPT +\frac{|V|}{2} \le \frac{3}{2}OPT
 	\end{align*}
 	And the last inequality is due to the fact that the optimal solution visits $|V|$ edges of weight one at least. 
 	
 \end{enumerate}	
 \end{proof}
+
+c) If every cycle was of size at least 3, than $k \le \frac{|V|}{3}$ and we will get
+	\begin{align*}
+	G \le cost(C) + k \le cost(C) + \frac{|V|}{3} \le OPT +\frac{|V|}{3} \le \frac{4}{3}OPT
+	\end{align*}
 
 \item \begin{enumerate}
 	\item We build MST $T = (R,E')$ on the sub graph which includes only nodes in $R$. Our algorithm will return $T$ which is also a feasible solution. We will show $c(T)$ is at most $2OPT$. Let $\tilde T=(\tilde V,\tilde E)$ be the steiner tree which has $c(\tilde T)=OPT$. $c(\tilde T) = \sum_{v\in \tilde V} c(v) + \sum_{e\in \tilde E} c(e)$. In the same way as we showed in class we can have that:
@@ -120,7 +134,7 @@ c'(e) &= \text{ceil $c(e)$ to multiple of $\delta$}\\
 c'' &: E \rightarrow \mathbb N\\
 c''(e) &= \lceil c(e) / \delta \rceil
 \end{align*} 
- We will build a 2-dimensions table $X=V\times (\frac{|E|\cdot (|V|-1)}{\epsilon} +1)$ where $X[v,j]$ has the min length of a path from $s$ to $v$ with cost (by $c''$) is at most $j$. We have:
+ We will build a 2-dimensions table $X=V\times [\frac{|E|\cdot (|V|-1)}{\epsilon} +1]$ where $X[v,j]$ has the min length of a path from $s$ to $v$ with cost (by $c''$) is at most $j$. We have:
 \begin{align*}
 X[v,j] = \begin{cases}
 0  & \text{if } j=0,v=s \\
@@ -186,7 +200,10 @@ Let $c_1,\ldots c_m$ denote the costs of the edges sorted from smallest to large
 \begin{claim} The algorithm run in polynomial time.
 \end{claim}
 \begin{proof}
+	The first loop runs $m = |V|$ times which is linear in the input size. In each iteration, the first three steps are linear in the input size trivially. Filling a cell in $X^i$ requires sampling a cell in each row in $X^i$. There are $|V|$ rows and $O(|E| \cdot |V| / \varepsilon)$ cols hence filling $X^i$ takes polynomial time.
+	Steps VI, II, III can be computed in polynomial with a naive implementation. 
 	
+	Construct\_Solution also takes polynomial time. Steps I, II, III, V takes polynomial time trivially. The loop in IV run at most $|V| - 1$ iteration because in each iteration, we recover the another step in the path from $t$ to $s$, and as claimed before, it is a simple path. Each iteration runs in $O(|E|)$ hence the total time complexity of the loop is polynomial.
 \end{proof}
 \begin{claim} The algorithm return feasible solution.
 \end{claim}
@@ -216,7 +233,11 @@ Use the same coloring used for $G'$ in $G$ for all the vertices except $v$. For 
 
 The algorithm for finding $(\Delta+1)$-coloring will work in a greedy fashion each time choose an uncolored node and color it with an available color. As the maximum degree is $\Delta$ we know we can do it with $\Delta +1$ colors.
 
-Next we will show that a bipartite graph is two colorable. Let $G = (A, B, E)$ be a bipartite graph. We color all the vertices in $A$ using the first color and all the vertices in $B$ using the second color. All the edges in $A$ are disjoint hence we don't have two vertices which use the first color which are connected. The same applies for $B$ and the second color.
+Next we will show that a bipartite graph is two colorable in polynomial time. A bipartite graph is two colorable because we can color each disjoint group $A, B$ in the first and second color respectively. 
+Let $G = (V, E)$ be a bipartite graph. Using BFS, color each vertex $v \in V$ using the first color if it is not connected to a vertex with the first color.
+Otherwise, color it using the second color.
+The coloring is valid because all for each connected part, all the coloring (except the first) were mandatory for a valid coloring. Since we know a valid coloring exists, the resulted coloring is also valid.
+
 	\item \textbf{Algorithm for finding $O(\sqrt{(n)})-coloring$:}
 	\begin{enumerate}
 		\item While there exist $v \in V(G)$ such that $\deg(v) \geq \sqrt{n}$
