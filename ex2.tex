@@ -1,0 +1,75 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{enumerate}% http://ctan.org/pkg/enumerate
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[section]{Lemma}
+\newtheorem{claim}[section]{Claim}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{observation}[theorem]{Observation}
+
+
+\title{Ex. 2}
+\author{Yuval Gitlitz \& Oren Roth}
+\date{28.6}
+
+\begin{document}
+
+\maketitle
+
+\begin{enumerate}
+\item 
+An $\frac{3}{2}$ approximation algorithm, given $G=(V,E)$:
+\begin{enumerate}
+
+\item Solve the Vertex Cover linear program from the class (the one we showed in class that any extreme point of it is half integral). Denote the solution by $X$ with value $LP$.
+\item $A \leftarrow \{v : X_v\in \{0.5\}\}$
+\item 4-color induced subgraph $G$ with the vertices of $A$. Denote the coloring by $c: V \rightarrow \{0,1,2,3\}$
+\item Choose subset of vertices 
+$U =  \{ v\in A: c(v) = i\}$ for 
+$$i \in argmax_{i \in \{0,1,2,3\}} \{ \sum_{ v\in A: c(v) = i}  X_v  \}$$
+\item return $S = \underbrace{\{v\in V: X_v=1\}}_{S_1} \cup \underbrace{ (A-U)}_{S_2}$
+\end{enumerate}
+\textbf{$S$ is Vertex Cover}
+As we showed in class the extreme points of the LP is half integral, and so for every $v\in V$, $X_v\in \{0,0.5,1\}$. Consider an edge $(u,v)$, we will show $S$ covers $(u,v)$. If $X_u=1$ or $X_v=1$  then $S$ covers $(u,v)$ by $S_1$. Else, due to the constraint on $(u,v)$, $X_u+X_v\ge 1$, it has to be the case that $X_u=X_v=0.5$, and hence, both $u$ and $v$ are in the induced subgraph of $G$. Because $c$ is legal coloring we have that $u$ and $v$ are coloring with differentr color and hence one of them is covered by $S_2$.
+%	First note that for any $i\in \{0,1,2,3\}$, if we denote $\tilde U =  \{ v: c(v) = i\}$, then $V-\tilde U$ is vertex cover. The reason is that $c$ is legal coloring, so for any edge we have that her endpoints are colored with two different colors and hence, one of its end point is in $V-\tilde U$. 
+\\
+\textbf{The algorithm gives $\frac{3}{2}$ approximation}
+Denote by $OPT$ the optimal vertex cover. Because $OPT$ is feasible in the LP program we know that $LP\le |OPT|$. Notice that $LP= 1\cdot |LP_1| + 0.5\cdot |LP_{0.5}|$ where,
+\begin{align*}
+LP_1 = \{X_v : X_v=1\}\\
+LP_{0.5} =  \{X_v : X_v=0.5\}\\
+\end{align*}
+We got that,
+\begin{align*}
+|LP_1| + 0.5\cdot |LP_{0.5}| \le |OPT|\\
+\frac{3}{2}(|LP_1| + 0.5\cdot |LP_{0.5}|)  = \frac{3}{2}|LP_1| + \frac{3}{4}\cdot |LP_{0.5}|) \le \frac{3}{2}(|OPT|)
+\end{align*}
+
+In (d) we have that $U$ is at least 0.25 of the size of $A$ so we have that,
+\begin{align*}
+|S| = |LP_1| + \frac{3}{4} |LP_{0.5}|
+\end{align*} 
+With the previous inequality we conclude, $|S|\le \frac{3}{4} |OPT|$.
+
+\item 
+Our two approximation algorithm is for every $(i, j) \in C$, we pick the shortest path between $i$ and $j$.
+
+We will show that it is a 2-approximation by contradiction.
+Assume there exist a set of calls $C$ such that the algorithm gives worse approximation than 2.
+Let $i$ be the index with the highest load by our algorithm. Denote by $X_m$ the pair $(m, m + 1\mod n)$.
+
+Since we used the shortest path for every call, every call is routed using at most $\lfloor n/2 \rfloor$ edges. Thus every call that routed through $X_{i}$ cannot be routed through $X_j = L_{i + \lfloor n/2 \rfloor + 1 \mod n}$. Since the load on $X_i$ by the optimal algorithm is less than $\lceil L_i / 2\rceil$, at least $\lfloor L_i / 2 \rfloor + 1$ calls that go through $X_i$ by our algorithm must be routed the other by the optimal algorithm. Hence the load on $X_j$ by the optimal algorithm is at least $\lfloor L_i / 2 \rfloor +1$ which is a contradiction to that the algorithm gives a worse approximation than 2.
+
+\end{enumerate}
+
+\end{document}
+
