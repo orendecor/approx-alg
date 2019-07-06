@@ -3,6 +3,8 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{enumerate}% http://ctan.org/pkg/enumerate
+\usepackage{algorithmic}
+
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}[theorem]{Corollary}
@@ -69,6 +71,41 @@ Let $i$ be the index with the highest load by our algorithm. Denote by $X_m$ the
 
 Since we used the shortest path for every call, every call is routed using at most $\lfloor n/2 \rfloor$ edges. Thus every call that routed through $X_{i}$ cannot be routed through $X_j = L_{i + \lfloor n/2 \rfloor + 1 \mod n}$. Since the load on $X_i$ by the optimal algorithm is less than $\lceil L_i / 2\rceil$, at least $\lfloor L_i / 2 \rfloor + 1$ calls that go through $X_i$ by our algorithm must be routed the other by the optimal algorithm. Hence the load on $X_j$ by the optimal algorithm is at least $\lfloor L_i / 2 \rfloor +1$ which is a contradiction to that the algorithm gives a worse approximation than 2.
 
+\item
+Let $e_1 \dots e_n = U$. We describe the relaxed problem using the following linear program:
+\begin{align*}
+min \sum_{j=1}^{n} x_j c_j \\
+s.t. \sum_{j : e_j \in S_i} x_j \geq 1, & i \in [m]\\
+x_j \geq 0, & j \in [n]
+\end{align*}
+
+Where we assign $x_j = 1$ if element $e_j$ is picked and $x_j = 0$ if it isn't. The sum constrain is to make sure that we picked at least one element from every set.
+
+The dual program:
+\begin{align*}
+max \sum_{j=1}^{m} y_j \\
+s.t. \sum_{j : e_i \in S_j} y_j \leq c_j, & i \in [n]\\
+y_j \geq 0, & j \in [m]
+\end{align*}
+
+We find a c-approximation algorithm using the following primal-dual algorithm:
+\begin{enumerate}
+    \item $y \gets $0
+    \item $I \leftarrow \emptyset$
+    \item while there exists $S_i$ which we didn't picked an element for it
+    \begin{enumerate}
+        \item Increase the dual variable $y_i$ until one of the constrains becomes tight.
+        \item Add the element that its constrain became tight
+    \end{enumerate}
+    \item return I
+\end{enumerate}
+
+It is easy to see the algorithm returns a feasible solution. For every set that we didn't choose an element, we add an element from it to the solution.
+
+We will show the algorithm is c-approximation. Let $y^*$ be the optimal solution for the dual problem and $y^*_i$ the value of its $y_i$ variable. Denote by $I$ the solution returned by our primal dual algorithm. Then since we added element $j$ to the solution  only if $\sum_{j : e_i \in S_j} y^*_j \geq c_j$:
+\begin{align*}
+    \sum_{i \in I} c_i \leq \sum_{i \in I} \sum_{j : e_i \in S_j} y^*_j \leq c \sum_{i=1}^{m} y^*_i \leq c \cdot OPT.
+\end{align*}
 \end{enumerate}
 
 \end{document}
